@@ -17,6 +17,8 @@ print("Wyniki działań to: "+str(sumaPierwsza)+" oraz: "+str(sumaDruga))
 
 sumaDruga = ()
 sumaTrzecia = {}
+sumaCzwarta = []
 
 print(type(sumaDruga))
 print(type(sumaTrzecia))
+print(type(sumaCzwarta))
