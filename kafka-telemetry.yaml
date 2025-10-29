@@ -1,0 +1,25 @@
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: kafka-egress-metrics
+  namespace: <twoj-ns>
+spec:
+  selector:
+    matchLabels: {}  # albo np. app: twoja-apka
+  metrics:
+  - providers:
+    - name: prometheus
+    overrides:
+    - match:
+        metric: ALL_METRICS
+      tagOverrides:
+        destination_service:
+          value: request.host
+        destination_ip:
+          value: connection.upstream.address
+        destination_port:
+          value: connection.upstream.port
+    # Wymuś także TCP metrics (dla nie-HTTP to kluczowe)
+    # W nowszym Istio TCP metryki są domyślnie włączone,
+    # ale ten Telemetry zapewnia bogatsze tagi.
+

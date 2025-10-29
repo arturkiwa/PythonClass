@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: dr-kafka-plain
+  namespace: <twoj-ns>
+spec:
+  host: kafka-plain.mesh
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: dr-kafka-ssl
+  namespace: <twoj-ns>
+spec:
+  host: kafka-ssl.mesh
+  trafficPolicy:
+    tls:
+      mode: DISABLE   # klient robi SSL; tu wciąż TCP pass-through
+
