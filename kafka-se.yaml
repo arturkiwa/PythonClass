@@ -1,15 +1,13 @@
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: kafka-plain-egress
-  namespace: <twoj-ns>
+  name: kafka-plain-b1
+  namespace: ptt-demo
 spec:
   hosts:
-  - kafka-plain.mesh            # dowolna, tylko spójna nazwa
-  addresses:                    # ważne przy połączeniach po IP – klasyfikuje ruch
+  - kafka-plain-b1.mesh
+  addresses:
   - 10.143.33.207
-  - 10.143.33.208
-  - 10.143.33.209
   location: MESH_EXTERNAL
   resolution: STATIC
   ports:
@@ -18,29 +16,42 @@ spec:
     protocol: TCP
   endpoints:
   - address: 10.143.33.207
-  - address: 10.143.33.208
-  - address: 10.143.33.209
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: kafka-ssl-egress
-  namespace: <twoj-ns>
+  name: kafka-plain-b2
+  namespace: ptt-demo
 spec:
   hosts:
-  - kafka-ssl.mesh
+  - kafka-plain-b2.mesh
   addresses:
-  - 10.143.104.48
-  - 10.143.104.49
-  - 10.143.104.50
+  - 10.143.33.208
   location: MESH_EXTERNAL
   resolution: STATIC
   ports:
-  - number: 9093
-    name: tcp-kafka-tls
+  - number: 9092
+    name: tcp-kafka
     protocol: TCP
   endpoints:
-  - address: 10.143.104.48
-  - address: 10.143.104.49
-  - address: 10.143.104.50
+  - address: 10.143.33.208
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kafka-plain-b3
+  namespace: ptt-demo
+spec:
+  hosts:
+  - kafka-plain-b3.mesh
+  addresses:
+  - 10.143.33.209
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  ports:
+  - number: 9092
+    name: tcp-kafka
+    protocol: TCP
+  endpoints:
+  - address: 10.143.33.209
 
