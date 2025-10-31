@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: egress-gw
+  namespace: istio-system
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - port:
+      number: 9092
+      name: tcp-kafka
+      protocol: TCP
+    hosts:
+    - kafka-b1.mesh
+    - kafka-b2.mesh
+    - kafka-b3.mesh
+

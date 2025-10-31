@@ -1,0 +1,54 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kafka-b1
+  namespace: ptt-demo
+spec:
+  hosts:
+  - kafka-b1.mesh
+  addresses:
+  - 10.143.33.207
+  ports:
+  - number: 9092
+    name: tcp-kafka
+    protocol: TCP
+  resolution: STATIC
+  endpoints:
+  - address: 10.143.33.207
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kafka-b2
+  namespace: ptt-demo
+spec:
+  hosts:
+  - kafka-b2.mesh
+  addresses:
+  - 10.143.33.208
+  ports:
+  - number: 9092
+    name: tcp-kafka
+    protocol: TCP
+  resolution: STATIC
+  endpoints:
+  - address: 10.143.33.208
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kafka-b3
+  namespace: ptt-demo
+spec:
+  hosts:
+  - kafka-b3.mesh
+  addresses:
+  - 10.143.33.209
+  ports:
+  - number: 9092
+    name: tcp-kafka
+    protocol: TCP
+  resolution: STATIC
+  endpoints:
+  - address: 10.143.33.209
+

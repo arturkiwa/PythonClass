@@ -1,0 +1,89 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kafka-b1-vs
+  namespace: ptt-demo
+spec:
+  hosts:
+  - kafka-b1.mesh
+  gateways:
+  - mesh
+  - istio-system/egress-gw
+  tcp:
+  # z mesha do egressa
+  - match:
+    - port: 9092
+      destinationSubnets:
+      - 10.143.33.207/32
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        port:
+          number: 9092
+  # z egressa do brokera
+  - match:
+    - port: 9092
+    route:
+    - destination:
+        host: kafka-b1.mesh
+        port:
+          number: 9092
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kafka-b2-vs
+  namespace: ptt-demo
+spec:
+  hosts:
+  - kafka-b2.mesh
+  gateways:
+  - mesh
+  - istio-system/egress-gw
+  tcp:
+  - match:
+    - port: 9092
+      destinationSubnets:
+      - 10.143.33.208/32
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        port:
+          number: 9092
+  - match:
+    - port: 9092
+    route:
+    - destination:
+        host: kafka-b2.mesh
+        port:
+          number: 9092
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kafka-b3-vs
+  namespace: ptt-demo
+spec:
+  hosts:
+  - kafka-b3.mesh
+  gateways:
+  - mesh
+  - istio-system/egress-gw
+  tcp:
+  - match:
+    - port: 9092
+      destinationSubnets:
+      - 10.143.33.209/32
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        port:
+          number: 9092
+  - match:
+    - port: 9092
+    route:
+    - destination:
+        host: kafka-b3.mesh
+        port:
+          number: 9092
+
