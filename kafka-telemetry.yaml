@@ -29,7 +29,7 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: sse-fix
+  name: sse-price-distribution-3000
   namespace: ptt-demo
 spec:
   workloadSelector:
@@ -51,9 +51,37 @@ spec:
           typed_config:
             "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
             inlineCode: |
-              function envoy_on_request(request_handle)
-                local accept = request_handle:headers():get("accept") or ""
-                if string.find(accept, "text/event%-stream") then
-                  request_handle:streamInfo():dynamicMetadata():set("envoy.filters.http.ssefix", "active", true)
+              -- Prosty filter dla SSE: rozpoznaje Accept: text/event-stream
+              -- i podbija time-out + wyłącza per-try timeout + kompresję.
+              
+              local SSE_TIMEOUT_MS = 3600000  -- 1h; jak chcesz więcej, podbij
+              
+              local function is_sse_request(headers)
+                local accept = headers:get("accept") or ""
+                if accept:lower():find("text/event%-stream", 1, true) ~= nil then
+                  return true
                 end
+                return false
+              end
+
+              function envoy_on_request(handle)
+                local headers = handle:headers()
+
+                if not is_sse_request(headers) then
+                  return
+                end
+
+                -- Podbij timeout upstream (override route timeout)
+                -- 0 zwykle znaczy "bez limitu", ale dajemy konkretną dużą wartość.
+                headers:replace("x-envoy-upstream-rq-timeout-ms", tostring(SSE_TIMEOUT_MS))
+
+                -- Wyłącz per-try timeout (0 = brak per-try timeoutu)
+                headers:replace("x-envoy-upstream-rq-per-try-timeout-ms", "0")
+
+                -- Wyłącz kompresję po stronie Envoya dla SSE
+                headers:replace("x-envoy-no-compression", "true")
+
+                -- (opcjonalnie) tag do logów/metadanych:
+                handle:logInfo("[SSE-FILTER] applied for request " ..
+                  (headers:get(":path") or ""))
               end
