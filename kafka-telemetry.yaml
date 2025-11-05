@@ -23,3 +23,37 @@ spec:
     # W nowszym Istio TCP metryki są domyślnie włączone,
     # ale ten Telemetry zapewnia bogatsze tagi.
 
+
+
+
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: sse-fix
+  namespace: ptt-demo
+spec:
+  workloadSelector:
+    labels:
+      app: ptt-demo-price-distribution
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          portNumber: 3000
+          filterChain:
+            filter:
+              name: envoy.filters.network.http_connection_manager
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.lua
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+            inlineCode: |
+              function envoy_on_request(request_handle)
+                local accept = request_handle:headers():get("accept") or ""
+                if string.find(accept, "text/event%-stream") then
+                  request_handle:streamInfo():dynamicMetadata():set("envoy.filters.http.ssefix", "active", true)
+                end
+              end
